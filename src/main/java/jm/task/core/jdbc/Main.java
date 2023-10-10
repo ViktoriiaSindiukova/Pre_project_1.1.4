@@ -15,6 +15,6 @@ public class Main {
         System.out.println(userService.getAllUsers().toString());
         userService.cleanUsersTable();
         userService.dropUsersTable();
-        Util.closeConnection();
+        Util.HibernateUtil.closeSessionFactory();
     }
 }

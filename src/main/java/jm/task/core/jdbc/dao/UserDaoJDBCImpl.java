@@ -39,56 +39,36 @@ public class UserDaoJDBCImpl implements UserDao {
 
     @Override
     public void saveUser(String name, String lastName, byte age) {
-        PreparedStatement preparedStatement = null;
         try {
             connection.setAutoCommit(false);
-            preparedStatement = connection.prepareStatement("INSERT INTO user (name, last_name, age) VALUES (?, ?, ?)");
-            preparedStatement.setString(1, name);
-            preparedStatement.setString(2, lastName);
-            preparedStatement.setByte(3, age);
-            preparedStatement.executeUpdate();
-            System.out.println("User с именем - " + name + " добавлен в базу данных");
-            connection.commit();
-        } catch (Exception e) {
-            try {
+            try (PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO user (name, last_name, age) VALUES (?, ?, ?)")) {
+                preparedStatement.setString(1, name);
+                preparedStatement.setString(2, lastName);
+                preparedStatement.setByte(3, age);
+                preparedStatement.executeUpdate();
+                System.out.println("User с именем - " + name + " добавлен в базу данных");
+                connection.commit();
+            } catch (Exception e) {
                 connection.rollback();
-            } catch (SQLException ex) {
-                throw new RuntimeException(ex);
             }
-        } finally {
-            if (preparedStatement != null) {
-                try {
-                    preparedStatement.close();
-                } catch (SQLException e) {
-                    throw new RuntimeException(e);
-                }
-            }
+        } catch (SQLException e) {
+            throw new RuntimeException();
         }
     }
 
     @Override
     public void removeUserById(long id) {
-        PreparedStatement preparedStatement = null;
         try {
             connection.setAutoCommit(false);
-            preparedStatement = connection.prepareStatement("DELETE FROM user WHERE id = ?");
-            preparedStatement.setLong(1, id);
-            preparedStatement.executeUpdate();
-            connection.commit();
-        } catch (Exception e) {
-            try {
+            try (PreparedStatement preparedStatement = connection.prepareStatement("DELETE FROM user WHERE id = ?")) {
+                preparedStatement.setLong(1, id);
+                preparedStatement.executeUpdate();
+                connection.commit();
+            } catch (Exception e) {
                 connection.rollback();
-            } catch (SQLException ex) {
-                throw new RuntimeException(ex);
             }
-        } finally {
-            if (preparedStatement != null) {
-                try {
-                    preparedStatement.close();
-                } catch (SQLException e) {
-                    throw new RuntimeException(e);
-                }
-            }
+        } catch (SQLException e) {
+            throw new RuntimeException();
         }
     }
 
