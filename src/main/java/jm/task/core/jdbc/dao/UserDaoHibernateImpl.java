@@ -77,7 +77,10 @@ public class UserDaoHibernateImpl implements UserDao {
     public List<User> getAllUsers() {
         try {
             Session session = sessionFactory.getCurrentSession();
-            return session.createQuery("from User", User.class).list();
+            Transaction transaction = session.beginTransaction();
+            List<User> listUser = session.createQuery("from User", User.class).list();
+            transaction.commit();
+            return listUser;
         } catch (Exception e) {
             throw new RuntimeException();
         }
@@ -88,7 +91,7 @@ public class UserDaoHibernateImpl implements UserDao {
         try {
             Session session = sessionFactory.getCurrentSession();
             Transaction transaction = session.beginTransaction();
-            session.createSQLQuery("DELETE FROM newschema_users.user").executeUpdate();
+            session.createSQLQuery("TRUNCATE TABLE user").executeUpdate();
             transaction.commit();
         } catch (Exception e) {
             throw new RuntimeException();
